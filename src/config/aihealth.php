@@ -1,0 +1,9 @@
+<?php
+
+return [
+    'dsn' => env('AIHEALTH_DSN'),
+    'environment' => env('APP_ENV', 'production'),
+    'send_logs' => env('AIHEALTH_SEND_LOGS', true),
+    'send_exceptions' => env('AIHEALTH_SEND_EXCEPTIONS', true),
+    'log_levels' => ['error', 'warning', 'critical', 'alert', 'emergency'],
+];
