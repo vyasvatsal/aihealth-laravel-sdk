@@ -32,6 +32,10 @@ class AIHealthServiceProvider extends ServiceProvider
             if (config('aihealth.send_logs')) {
                 $this->app->make(LogHandler::class)->register();
             }
+
+            if (config('aihealth.send_transactions', true)) {
+                $this->app->make(\AIHealth\Laravel\Trackers\TransactionTracker::class)->register();
+            }
         }
     }
 }

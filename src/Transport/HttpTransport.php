@@ -44,7 +44,7 @@ class HttpTransport
 
         try {
             // Send in batch to reduce network requests
-            Http::timeout(3)
+            Http::timeout(15)
                 ->withHeaders([
                     'X-Monitor-Key' => $this->projectKey,
                     'Accept' => 'application/json',

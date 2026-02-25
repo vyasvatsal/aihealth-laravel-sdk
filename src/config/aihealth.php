@@ -5,5 +5,6 @@ return [
     'environment' => env('APP_ENV', 'production'),
     'send_logs' => env('AIHEALTH_SEND_LOGS', true),
     'send_exceptions' => env('AIHEALTH_SEND_EXCEPTIONS', true),
+    'send_transactions' => env('AIHEALTH_SEND_TRANSACTIONS', true),
     'log_levels' => ['error', 'warning', 'critical', 'alert', 'emergency'],
 ];

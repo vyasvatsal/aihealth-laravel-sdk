@@ -59,6 +59,20 @@ class Client
         $this->enrichAndSend($payload);
     }
 
+    public function captureTransaction(array $data)
+    {
+        if ($this->shouldIgnore()) {
+            return;
+        }
+
+        $payload = array_merge([
+            'type' => 'transaction',
+            'timestamp' => now()->toISOString(),
+        ], $data);
+
+        $this->enrichAndSend($payload);
+    }
+
     protected function enrichAndSend(array $payload)
     {
         try {
