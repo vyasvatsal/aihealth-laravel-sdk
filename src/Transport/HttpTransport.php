@@ -44,7 +44,7 @@ class HttpTransport
 
         try {
             // Send in batch to reduce network requests
-            Http::timeout(15)
+            $response = Http::timeout(15)
                 ->withHeaders([
                     'X-Monitor-Key' => $this->projectKey,
                     'Accept' => 'application/json',
@@ -52,6 +52,13 @@ class HttpTransport
                 ->post($this->endpoint, [
                     'events' => $this->pendingPayloads
                 ]);
+
+            if ($response->failed()) {
+                error_log('AIHealth SDK Ingest Failed: ' . $response->status() . ' Body: ' . $response->body());
+            } else {
+                error_log('AIHealth SDK Ingest Success: ' . $response->status());
+            }
+
         } catch (\Exception $e) {
             // Silent fail! We NEVER crash the user's app if our tracking API is down.
             error_log('AIHealth SDK Failed to send payload: ' . $e->getMessage());
