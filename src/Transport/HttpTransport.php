@@ -9,13 +9,15 @@ class HttpTransport
     protected array $pendingPayloads = [];
     protected string $endpoint;
     protected string $projectKey;
+    protected ?string $projectId;
 
-    public function __construct(protected string $dsn)
+    public function __construct(protected string $dsn, ?string $projectId = null)
     {
         // Parse DSN format: http://project-key@127.0.0.1:8000/api/ingest
         $parsed = parse_url($dsn);
 
         $this->projectKey = $parsed['user'] ?? '';
+        $this->projectId = $projectId;
 
         // Rebuild the URL without the user/pass
         $scheme = $parsed['scheme'] ?? 'https';
@@ -36,7 +38,7 @@ class HttpTransport
         $this->pendingPayloads[] = $payload;
     }
 
-    protected function flush()
+    public function flush()
     {
         if (empty($this->pendingPayloads)) {
             return;
@@ -44,11 +46,14 @@ class HttpTransport
 
         try {
             // Send in batch to reduce network requests
+            $headers = array_filter([
+                'X-Monitor-Key' => $this->projectKey,
+                'X-Project-Id' => $this->projectId,
+                'Accept' => 'application/json',
+            ]);
+
             $response = Http::timeout(15)
-                ->withHeaders([
-                    'X-Monitor-Key' => $this->projectKey,
-                    'Accept' => 'application/json',
-                ])
+                ->withHeaders($headers)
                 ->post($this->endpoint, [
                     'events' => $this->pendingPayloads
                 ]);

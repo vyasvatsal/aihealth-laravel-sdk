@@ -14,7 +14,7 @@ class Client
     public function __construct(array $config, $app)
     {
         $this->app = $app;
-        $this->transport = new HttpTransport($config['dsn']);
+        $this->transport = new HttpTransport($config['dsn'], $config['project_id'] ?? null);
     }
 
     public function captureException(Throwable $e)
@@ -71,6 +71,41 @@ class Client
         ], $data);
 
         $this->enrichAndSend($payload);
+    }
+
+    public function captureHealth(array $data = [])
+    {
+        if ($this->shouldIgnore()) {
+            return;
+        }
+
+        $memoryUsage = memory_get_usage(true) / 1024 / 1024;
+        $cpuLoad = function_exists('sys_getloadavg') ? sys_getloadavg() : [0, 0, 0];
+
+        $dbConnected = false;
+        try {
+            if ($this->app->bound('db')) {
+                $this->app->make('db')->connection()->getPdo();
+                $dbConnected = true;
+            }
+        } catch (\Throwable $e) {
+            $dbConnected = false;
+        }
+
+        $payload = array_merge([
+            'type' => 'health',
+            'timestamp' => now()->toISOString(),
+            'memory_usage_mb' => round($memoryUsage, 2),
+            'cpu_load' => $cpuLoad[0] ?? 0,
+            'db_connected' => $dbConnected,
+        ], $data);
+
+        $this->enrichAndSend($payload);
+
+        // Force flush if it's called individually (e.g. from an artisan command)
+        if ($this->app->runningInConsole()) {
+            $this->transport->flush();
+        }
     }
 
     protected function enrichAndSend(array $payload)

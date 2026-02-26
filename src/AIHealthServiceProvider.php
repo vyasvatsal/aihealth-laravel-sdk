@@ -17,10 +17,16 @@ class AIHealthServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        if ($this->app->runningInConsole() && function_exists('config_path')) {
-            $this->publishes([
-                __DIR__ . '/config/aihealth.php' => config_path('aihealth.php'),
-            ], 'aihealth-config');
+        if ($this->app->runningInConsole()) {
+            if (function_exists('config_path')) {
+                $this->publishes([
+                    __DIR__ . '/config/aihealth.php' => config_path('aihealth.php'),
+                ], 'aihealth-config');
+            }
+
+            $this->commands([
+                \AIHealth\Laravel\Commands\SendHealthCommand::class,
+            ]);
         }
 
         // Only register hooks if the DSN is configured
