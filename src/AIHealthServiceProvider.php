@@ -43,5 +43,17 @@ class AIHealthServiceProvider extends ServiceProvider
                 $this->app->make(\AIHealth\Laravel\Trackers\TransactionTracker::class)->register();
             }
         }
+
+        // Register the Blade Directive for Real User Monitoring
+        \Illuminate\Support\Facades\Blade::directive('aihealth', function () {
+            $key = config('aihealth.private_tracking_key');
+            $endpoint = config('aihealth.rum_endpoint');
+
+            if (!$key || !$endpoint) {
+                return "<!-- AIHealth RUM Disabled: Missing Key or Endpoint -->";
+            }
+
+            return "<?php echo \AIHealth\Laravel\Trackers\RumTracker::renderScript('$key', '$endpoint'); ?>";
+        });
     }
 }
