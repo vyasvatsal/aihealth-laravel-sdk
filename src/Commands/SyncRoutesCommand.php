@@ -66,7 +66,13 @@ class SyncRoutesCommand extends Command
                 $scheme = $parsed['scheme'] ?? 'https';
                 $host = $parsed['host'] ?? '';
                 $port = isset($parsed['port']) ? ':' . $parsed['port'] : '';
+
+                // Usually the project ID is in the path for DSNs (e.g. /1)
                 $path = $parsed['path'] ?? '/api/ingest';
+                if (empty($projectId) && preg_match('#^/(\d+)$#', $path, $matches)) {
+                    $projectId = $matches[1];
+                    $path = '/api/ingest';
+                }
 
                 $endpoint = $scheme . '://' . $host . $port . $path;
             }
