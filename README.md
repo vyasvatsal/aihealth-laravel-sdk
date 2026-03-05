@@ -67,7 +67,7 @@ Set up the Laravel Scheduler in your `Console/Kernel.php` or `routes/console.php
 // routes/console.php
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('aihealth:send-health')->everyFiveMinutes();
+Schedule::command('aihealth:health')->everyFiveMinutes();
 ```
 
 Make sure your cron job is running on the server:

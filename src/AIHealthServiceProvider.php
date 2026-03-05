@@ -30,8 +30,10 @@ class AIHealthServiceProvider extends ServiceProvider
             ]);
         }
 
-        // Only register hooks if the DSN is configured
-        if (config('aihealth.dsn')) {
+        // Only register hooks if the connection is configured (DSN or API Key/Endpoint)
+        $hasConnection = !empty(config('aihealth.dsn')) || (!empty(config('aihealth.api_key')) && !empty(config('aihealth.endpoint')));
+
+        if ($hasConnection) {
             if (config('aihealth.send_exceptions')) {
                 $this->app->make(ErrorHandler::class)->register();
             }
@@ -57,7 +59,7 @@ class AIHealthServiceProvider extends ServiceProvider
             return "<?php echo \AIHealth\Laravel\Trackers\RumTracker::renderScript('$key', '$endpoint'); ?>";
         });
         // Auto-register the heartbeat scheduler so the user doesn't have to manually do it! (Hardcore Mode)
-        if (config('aihealth.dsn')) {
+        if ($hasConnection) {
             $this->app->booted(function () {
                 $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
                 $schedule->command('aihealth:health')->everyFiveMinutes();
