@@ -61,16 +61,9 @@ Route::get('/debug-sentry', function () {
 
 The Health Analysis module monitors CPU load, Memory limits, and Database connectivity. 
 
-Set up the Laravel Scheduler in your `Console/Kernel.php` or `routes/console.php` to push health heartbeats automatically:
+The SDK automatically registers a background heartbeat that runs every five minutes. The only requirement is that your server must have Laravel's base CRON scheduler running.
 
-```php
-// routes/console.php
-use Illuminate\Support\Facades\Schedule;
-
-Schedule::command('aihealth:health')->everyFiveMinutes();
-```
-
-Make sure your cron job is running on the server:
+Make sure your server is running the standard Laravel cron job (normally set up once per server):
 `* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1`
 
 ---
@@ -116,7 +109,6 @@ php artisan aihealth:sync-routes
 ## Summary
 
 With these simple steps, your Laravel application is fully instrumented:
-1. **Composer Require & .env DSN** (Activates the SDK, Error Tracking, and Transactions)
-2. **Scheduled Command** (Activates Background Server Health monitoring)
-3. **`@aihealth` Blade Directive** (Activates Web/RUM analysis and Frontend CTA interactions)
-4. **Command Execution** (`aihealth:sync-routes` to initialize Web Analysis crawling)
+1. **Composer Require & .env API Keys** (Activates the SDK, Error Tracking, Logs, Transactions, and Background Health Monitor)
+2. **`@aihealth` Blade Directive** (Activates Web/RUM analysis and Frontend CTA interactions)
+3. **Command Execution** (`aihealth:sync-routes` to initialize Web Analysis crawling)
