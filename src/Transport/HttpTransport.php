@@ -10,6 +10,7 @@ class HttpTransport
     protected string $endpoint;
     protected string $projectKey;
     protected ?string $projectId;
+    protected ?string $appName = null;
 
     public function __construct(array $config)
     {
@@ -36,6 +37,13 @@ class HttpTransport
             $host = $parsed['host'] ?? '';
             $port = isset($parsed['port']) ? ':' . $parsed['port'] : '';
             $path = $parsed['path'] ?? '/api/ingest';
+
+            // Auto-detect project ID from path if it matches /123
+            if (empty($this->projectId) && preg_match('#^/(\d+)$#', $path, $matches)) {
+                $this->projectId = $matches[1];
+                $path = '/api/ingest';
+            }
+
             $this->endpoint = "{$scheme}://{$host}{$port}{$path}";
         } else {
             // Unconfigured fallback
@@ -47,6 +55,11 @@ class HttpTransport
         app()->terminating(function () {
             $this->flush();
         });
+    }
+
+    public function setAppName(string $name)
+    {
+        $this->appName = $name;
     }
 
     public function send(array $payload)
@@ -70,9 +83,10 @@ class HttpTransport
 
             $response = Http::timeout(15)
                 ->withHeaders($headers)
-                ->post($this->endpoint, [
+                ->post($this->endpoint, array_filter([
+                    'app_name' => $this->appName,
                     'events' => $this->pendingPayloads
-                ]);
+                ]));
 
             if ($response->failed()) {
                 error_log('AIHealth SDK Ingest Failed: ' . $response->status() . ' Body: ' . $response->body());

@@ -15,6 +15,10 @@ class Client
     {
         $this->app = $app;
         $this->transport = new HttpTransport($config);
+
+        if ($this->app->bound('config')) {
+            $this->transport->setAppName($this->app->make('config')->get('app.name', 'Laravel'));
+        }
     }
 
     public function captureException(Throwable $e)

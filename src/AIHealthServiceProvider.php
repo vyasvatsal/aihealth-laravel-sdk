@@ -27,6 +27,7 @@ class AIHealthServiceProvider extends ServiceProvider
             $this->commands([
                 \AIHealth\Laravel\Commands\SendHealthCommand::class,
                 \AIHealth\Laravel\Commands\SyncRoutesCommand::class,
+                \AIHealth\Laravel\Commands\TestCommand::class,
             ]);
         }
 
