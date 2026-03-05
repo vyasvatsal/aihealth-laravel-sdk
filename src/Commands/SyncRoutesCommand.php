@@ -93,12 +93,15 @@ class SyncRoutesCommand extends Command
         $syncUrl = rtrim($endpoint, '/') . '/v1/projects/routes/sync';
 
         try {
+            $this->info('Sending payload to: ' . $syncUrl);
+            $this->info('Payload size: ' . strlen(json_encode($validRoutes)) . ' bytes');
+
             $response = Http::withHeaders([
                 'X-Monitor-Key' => $apiKey,
                 'X-Project-Id' => $projectId,
                 'Accept' => 'application/json'
             ])
-                ->timeout(10)
+                ->timeout(30)
                 ->post($syncUrl, [
                     'routes' => $validRoutes
                 ]);
