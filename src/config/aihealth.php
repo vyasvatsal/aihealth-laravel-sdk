@@ -2,6 +2,8 @@
 
 return [
     'dsn' => env('AIHEALTH_DSN'),
+    'api_key' => env('AIHEALTH_API_KEY'),
+    'endpoint' => env('AIHEALTH_ENDPOINT'),
     'project_id' => env('AIHEALTH_PROJECT_ID'),
     'environment' => env('APP_ENV', 'production'),
     'send_logs' => env('AIHEALTH_SEND_LOGS', true),

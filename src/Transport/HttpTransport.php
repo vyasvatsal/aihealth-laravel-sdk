@@ -11,21 +11,37 @@ class HttpTransport
     protected string $projectKey;
     protected ?string $projectId;
 
-    public function __construct(protected string $dsn, ?string $projectId = null)
+    public function __construct(array $config)
     {
-        // Parse DSN format: http://project-key@127.0.0.1:8000/api/ingest
-        $parsed = parse_url($dsn);
+        $this->projectId = $config['project_id'] ?? null;
 
-        $this->projectKey = $parsed['user'] ?? '';
-        $this->projectId = $projectId;
-
-        // Rebuild the URL without the user/pass
-        $scheme = $parsed['scheme'] ?? 'https';
-        $host = $parsed['host'] ?? '';
-        $port = isset($parsed['port']) ? ':' . $parsed['port'] : '';
-        $path = $parsed['path'] ?? '/api/ingest';
-
-        $this->endpoint = "{$scheme}://{$host}{$port}{$path}";
+        // Modern environment setup using split keys 
+        if (!empty($config['api_key']) && !empty($config['endpoint'])) {
+            $this->projectKey = $config['api_key'];
+            // Ingest endpoint should ensure /api/ingest structure based on backwards compat
+            $this->endpoint = rtrim($config['endpoint'], '/');
+            if (!str_ends_with($this->endpoint, '/api/ingest')) {
+                // Not standard ingest path, might be a bug from the user, but we'll trust it 
+                // Or let's assume aihealth.endpoint is the base URL if it doesn't end in /api/ingest
+                if (!str_contains($this->endpoint, '/api')) {
+                    $this->endpoint .= '/api/ingest';
+                }
+            }
+        }
+        // Legacy fallback to DSN string
+        elseif (!empty($config['dsn'])) {
+            $parsed = parse_url($config['dsn']);
+            $this->projectKey = $parsed['user'] ?? '';
+            $scheme = $parsed['scheme'] ?? 'https';
+            $host = $parsed['host'] ?? '';
+            $port = isset($parsed['port']) ? ':' . $parsed['port'] : '';
+            $path = $parsed['path'] ?? '/api/ingest';
+            $this->endpoint = "{$scheme}://{$host}{$port}{$path}";
+        } else {
+            // Unconfigured fallback
+            $this->projectKey = '';
+            $this->endpoint = '';
+        }
 
         // Hook into the end of the Laravel request lifecycle
         app()->terminating(function () {

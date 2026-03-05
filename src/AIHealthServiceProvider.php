@@ -26,6 +26,7 @@ class AIHealthServiceProvider extends ServiceProvider
 
             $this->commands([
                 \AIHealth\Laravel\Commands\SendHealthCommand::class,
+                \AIHealth\Laravel\Commands\SyncRoutesCommand::class,
             ]);
         }
 
@@ -55,5 +56,12 @@ class AIHealthServiceProvider extends ServiceProvider
 
             return "<?php echo \AIHealth\Laravel\Trackers\RumTracker::renderScript('$key', '$endpoint'); ?>";
         });
+        // Auto-register the heartbeat scheduler so the user doesn't have to manually do it! (Hardcore Mode)
+        if (config('aihealth.dsn')) {
+            $this->app->booted(function () {
+                $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+                $schedule->command('aihealth:health')->everyFiveMinutes();
+            });
+        }
     }
 }

@@ -14,7 +14,7 @@ class Client
     public function __construct(array $config, $app)
     {
         $this->app = $app;
-        $this->transport = new HttpTransport($config['dsn'], $config['project_id'] ?? null);
+        $this->transport = new HttpTransport($config);
     }
 
     public function captureException(Throwable $e)
