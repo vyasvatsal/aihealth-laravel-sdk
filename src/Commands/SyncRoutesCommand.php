@@ -69,9 +69,14 @@ class SyncRoutesCommand extends Command
 
                 // Usually the project ID is in the path for DSNs (e.g. /1)
                 $path = $parsed['path'] ?? '/api/ingest';
-                if (empty($projectId) && preg_match('#^/(\d+)$#', $path, $matches)) {
-                    $projectId = $matches[1];
-                    $path = '/api/ingest';
+                if (empty($projectId)) {
+                    if (preg_match('#^/(\d+)$#', $path, $matches)) {
+                        $projectId = $matches[1];
+                        $path = '/api/ingest';
+                    } else {
+                        // If no project ID is found in the path, assume 1 as fallback for legacy systems
+                        $projectId = 1;
+                    }
                 }
 
                 $endpoint = $scheme . '://' . $host . $port . $path;
