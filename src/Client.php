@@ -133,7 +133,7 @@ class Client
                 $request = $this->app->make('request');
                 // Never capture errors originating from the ingest ingest endpoint itself
                 // to prevent infinite loops (reporting an error about reporting an error)
-                if ($request->is('api/ingest*')) {
+                if ($request->is('api/ingest*') || $request->is('api/v1/projects/routes*')) {
                     return true;
                 }
             }
