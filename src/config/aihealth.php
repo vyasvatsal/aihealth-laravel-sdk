@@ -14,4 +14,7 @@ return [
     // Real User Monitoring (RUM) Configuration
     'private_tracking_key' => env('AIHEALTH_PRIVATE_TRACKING_KEY'),
     'rum_endpoint' => env('AIHEALTH_RUM_ENDPOINT', 'https://your-health-monitor.com/api/v1/metrics/track'),
+
+    // Security
+    'verify_ssl' => env('AIHEALTH_VERIFY_SSL', true),
 ];

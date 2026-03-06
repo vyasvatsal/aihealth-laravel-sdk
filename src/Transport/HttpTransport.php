@@ -81,12 +81,16 @@ class HttpTransport
                 'Accept' => 'application/json',
             ]);
 
-            $response = Http::timeout(15)
-                ->withHeaders($headers)
-                ->post($this->endpoint, array_filter([
-                    'app_name' => $this->appName,
-                    'events' => $this->pendingPayloads
-                ]));
+            $request = Http::timeout(15)->withHeaders($headers);
+
+            if (config('aihealth.verify_ssl') === false) {
+                $request->withoutVerifying();
+            }
+
+            $response = $request->post($this->endpoint, array_filter([
+                'app_name' => $this->appName,
+                'events' => $this->pendingPayloads
+            ]));
 
             if ($response->failed()) {
                 error_log('AIHealth SDK Ingest Failed: ' . $response->status() . ' Body: ' . $response->body());

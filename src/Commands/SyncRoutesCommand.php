@@ -96,15 +96,19 @@ class SyncRoutesCommand extends Command
             $this->info('Sending payload to: ' . $syncUrl);
             $this->info('Payload size: ' . strlen(json_encode($validRoutes)) . ' bytes');
 
-            $response = Http::withHeaders([
+            $request = Http::withHeaders([
                 'X-Monitor-Key' => $apiKey,
                 'X-Project-Id' => $projectId,
                 'Accept' => 'application/json'
-            ])
-                ->timeout(30)
-                ->post($syncUrl, [
-                    'routes' => $validRoutes
-                ]);
+            ])->timeout(30);
+
+            if (config('aihealth.verify_ssl') === false) {
+                $request->withoutVerifying();
+            }
+
+            $response = $request->post($syncUrl, [
+                'routes' => $validRoutes
+            ]);
 
             if ($response->successful()) {
                 $this->info('✅ Successfully synced routes to the Health Monitor.');

@@ -107,6 +107,28 @@ Run the following command once, or whenever you add new frontend-facing routes:
 php artisan aihealth:sync-routes
 ```
 
+## Troubleshooting
+
+### SSL Certificate Error (cURL error 60)
+If you see an error like `SSL certificate problem: unable to get local issuer certificate`, it means your local environment (like XAMPP or Laragon) isn't configured with a trusted root CA. 
+
+To bypass this for **local development ONLY**, add this to your `.env`:
+
+```env
+AIHEALTH_VERIFY_SSL=false
+```
+
+### "There are no commands defined in the aihealth namespace"
+If you've installed the SDK but cannot run the `php artisan aihealth:*` commands, try clearing your artisan cache:
+
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan package:discover
+```
+
+---
+
 ## Summary
 
 With these simple steps, your Laravel application is fully instrumented:
