@@ -8,10 +8,11 @@ This guide covers the all-in-one setup.
 
 ## 1. Installation
 
-Install the SDK via Composer (make sure your repositories list in `composer.json` points to the SDK if it's private):
+Because the SDK is currently in private development, you need to add our repository to your `composer.json` before installing:
 
 ```bash
-composer require aihealth/laravel-sdk
+composer config repositories.aihealth vcs https://github.com/vyasvatsal/aihealth-laravel-sdk.git
+composer require aihealth/laravel-monitor
 ```
 
 ---
