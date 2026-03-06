@@ -83,7 +83,8 @@ class HttpTransport
 
             $request = Http::timeout(15)->withHeaders($headers);
 
-            if (config('aihealth.verify_ssl') === false) {
+            // Safety check: Skip SSL verification if explicitly disabled or if we're on a local environment
+            if (config('aihealth.verify_ssl') === false || app()->environment('local')) {
                 $request->withoutVerifying();
             }
 

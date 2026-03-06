@@ -16,5 +16,6 @@ return [
     'rum_endpoint' => env('AIHEALTH_RUM_ENDPOINT', 'https://your-health-monitor.com/api/v1/metrics/track'),
 
     // Security
-    'verify_ssl' => env('AIHEALTH_VERIFY_SSL', true),
+    // Automatically skip SSL verification in local environments for a smoother developer experience.
+    'verify_ssl' => env('AIHEALTH_VERIFY_SSL', env('APP_ENV') !== 'local'),
 ];
